@@ -80,7 +80,7 @@ In order to start deploying upgradeable ERC contract, script file is executed as
 ### Verify contract
 Go to proxy contract address in Etherscan and verify it as proxy contract. Copy the implementation contract address if it stated that implementation contract address is not verified yet.   
 
-Next, run `npx hardhat verify <impl_address> --network rinkeby` where `<impl_address>` is the implementation address shown by the command above. Click on the link at the output of the command to verify contract is verified in Etherscan. 
+Next, run `npx hardhat verify <impl_address> --network rinkeby` where `<impl_address>` is the implementation address copied above. Click on the link at the output of the command to verify contract is verified in Etherscan. 
 
 ***
 ## Revision update
