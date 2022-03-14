@@ -64,22 +64,21 @@ ETHERSCAN_API_KEY="INSERT_ETHERSCAB_API_HERE"
 
 ### Deploy UUPS contract
 
-In order to start deploy upgradeable ERC contract, script file is executed ascendingly as shown below. Make sure `.env` file is filled in accordingly except `DEPLOYED_PROXY_ADDRESS` as we will get the information after our first script.
+In order to start deploying upgradeable ERC contract, script file is executed ascendingly as shown below. Make sure `.env` file is filled in accordingly except `DEPLOYED_PROXY_ADDRESS` as we will get the information after our first script.
 
 1. Run `npx hardhat run scripts/1_deploy.js --network rinkeby` command in console and copy the deployed proxy address shown in output of the script into `DEPLOYED_PROXY_ADDRESS`. Check and make sure contract is already been created by searching deployed proxy address in Etherscan.
 2. Run `npx hardhat run scripts/2_transfer_ownership.js --network rinkeby` command and ownership of the proxy address will be transferred from metamask wallet to Gnosis safe contract shown in output of the script.
-3. Optionally, run `npx hardhat run scripts/verify_ownership.js --network rinkeby` and make sure output is same as `GNOSIS_SAFE` in .env file.
-4. Since we had transferred ownership to Gnosis Safe multi-sig contract, there is no straightforward way to update the contract using hardhat command. we could however generate upgrade proposal that can be further processed in OpenZeppelin Defender.
-5. Log in into OpenZeppelin Defender and add proxy address contract into it. Fill in name (for reference), network (Rinkeby), address(`DEPLOYED_PROXY_ADDRESS`). Notice that there is a space of [ABI](https://www.quicknode.com/guides/solidity/what-is-an-abi) to be filled in. 
-6. In order to fill in the ABI accordingly, first the underlying implementation contract of proxy contract have to be [verified](#verify-contract) and ABI is then retrieved from implementation contract in Etherscan. First, go to EtherScan then enter the verified implementation contract address. Next, click on the `Contract` in the tab section heading and scroll down to find the `Contract ABI` then copy it.
-7. Paste into the ABI field in Step 5 and press `Add` to add proxy contract into OpenZeppelin Defender.
-8. Run `npx hardhat run scripts/3_propose_upgrade.js --network rinkeby` command and click on the link shown in output of the script.
-9. Approve proposal in OpenZeppelin Defender and proxy contract will be updated with new implementation contract. Keep note that each newly generated implementation contract have to be [verified](#verify-contract) in order to obtain ABI and be updated in OpenZeppelin Defender proxy contract for contract interaction.
-10.Similar steps are taken to update contract to V3 by running `npx hardhat run scripts/4_propose_upgrade_v3.js --network rinkeby` command and click on the link shown in output of the script. Then,repeat step 9. 
+3. Since we had transferred ownership to Gnosis Safe multi-sig contract, there is no straightforward way to update the contract using hardhat command. we could however generate upgrade proposal that can be further processed in OpenZeppelin Defender.
+4. Log in into OpenZeppelin Defender and add proxy address contract into it. Fill in name (for reference), network (Rinkeby), address(`DEPLOYED_PROXY_ADDRESS`). Notice that there is a space of [ABI](https://www.quicknode.com/guides/solidity/what-is-an-abi) to be filled in. 
+5. In order to fill in the ABI accordingly, first the underlying implementation contract of proxy contract have to be [verified](#verify-contract) and ABI is then retrieved from implementation contract in Etherscan. First, go to EtherScan then enter the verified implementation contract address. Next, click on the `Contract` in the tab section heading and scroll down to find the `Contract ABI` then copy it.
+6. Paste into the ABI field in Step 5 and press `Add` to add proxy contract into OpenZeppelin Defender.
+7. Run `npx hardhat run scripts/3_propose_upgrade.js --network rinkeby` command and click on the link shown in output of the script.
+8. Approve proposal in OpenZeppelin Defender and proxy contract will be updated with new implementation contract. Keep note that each newly generated implementation contract have to be [verified](#verify-contract) in order to obtain ABI and ABI should be updated in OpenZeppelin Defender proxy contract for contract interaction.
+9. Similar steps are taken to update contract to V3 by running `npx hardhat run scripts/4_propose_upgrade_v3.js --network rinkeby` command and click on the link shown in output of the script. Then,repeat step 9. 
 
 
 ### Verify contract
-Run `npx hardhat run scripts/get_implementation_contract.js --network rinkeby` to obtain the current implementation address of deployed proxy contract. 
+Go to proxy contract address in Etherscan and verify it as proxy contract. Copy the implementation contract address if it stated that implementation contract address is not verified yet.   
 
 Next, run `npx hardhat verify <impl_address> --network rinkeby` where `<impl_address>` is the implementation address shown by the command above. Click on the link at the output of the command to verify contract is verified in Etherscan. 
 
