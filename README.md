@@ -23,7 +23,7 @@ The whole project directory can be break down into few major parts such as:
  |folder        | Description                                                                              
  |:------------:|:------------------------------------------------------------------------------------------
  | [`contracts`](contracts/)  |Folder that contains all contracts [revision(s)](#revision-update) that inherited from OpenZeppelin's templates
- | [`scripts`](scripts/)    |Script files written in JavaScript that normally used for verify and deploy to blockchain based on [configuration file settings](#configuration-file)
+ | [`scripts`](scripts/)    |Script files written in JavaScript that normally used for deploying contracts to blockchain based on [configuration file settings](#configuration-file)
  | [`test`](test/)       |Test files written in JavaScript to test contracts locally before deployed to blockchain based on [test setup](#test-setup)  
 
 ### Pre-requisite
@@ -36,7 +36,7 @@ The whole project directory can be break down into few major parts such as:
 - Create at least 1 [Metamask wallet](https://metamask.io/faqs/) and change to Rinkeby testnet
 
 ### Configuration file
-[hardhat.config.js](hardhat.config.js) is the configuration file used by `hardhat` command to execute scripts stored in [scripts](scripts/) folder. Notice that `dotenv` library is used to store secret keys or API keys in configuration file and the complete sample can be retrieved at [.env file configuration](#env-file-sample).
+[hardhat.config.js](hardhat.config.js) is the configuration file used by `hardhat` command to execute scripts stored in [scripts](scripts/) folder. Notice that `dotenv` library is used to store secret keys or API keys in configuration file and the complete sample can be retrieved at [.env file section](#env-file-sample).
 
 ### Test setup
 After installing all dependencies using `npm install`, all tests should be able to execute using `npx hardhat test` command that will:
@@ -62,6 +62,9 @@ DEFENDER_TEAM_API_SECRET_KEY="INSERT_OPEN_ZEPPELIN_DEFENDER_TEAM_SECRET_KEY_HERE
 ETHERSCAN_API_KEY="INSERT_ETHERSCAB_API_HERE"
 ```
 
+### Thing to take note
+> Change `function upgradeToV2() public` to `function upgradeToV2() public onlyOwner` in [MakeWorldPeaceV2.sol](contracts/MakeWorldPeaceV2.sol)
+
 ### Deploy UUPS contract
 
 In order to start deploying upgradeable ERC contract, script file is executed ascendingly as shown below. Make sure `.env` file is filled in accordingly except `DEPLOYED_PROXY_ADDRESS` as we will get the information after our first script.
@@ -69,12 +72,13 @@ In order to start deploying upgradeable ERC contract, script file is executed as
 1. Run `npx hardhat run scripts/1_deploy.js --network rinkeby` command in console and copy the deployed proxy address shown in output of the script into `DEPLOYED_PROXY_ADDRESS`. Check and make sure contract is already been created by searching deployed proxy address in Etherscan.
 2. Run `npx hardhat run scripts/2_transfer_ownership.js --network rinkeby` command and ownership of the proxy address will be transferred from metamask wallet to Gnosis safe contract shown in output of the script.
 3. Since we had transferred ownership to Gnosis Safe multi-sig contract, there is no straightforward way to update the contract using hardhat command. we could however generate upgrade proposal that can be further processed in OpenZeppelin Defender.
-4. Log in into OpenZeppelin Defender and add proxy address contract into it. Fill in name (for reference), network (Rinkeby), address(`DEPLOYED_PROXY_ADDRESS`). Notice that there is a space of [ABI](https://www.quicknode.com/guides/solidity/what-is-an-abi) to be filled in. 
+4. Log in into OpenZeppelin Defender and add proxy address contract into it. Fill in name (any name you like), network (Rinkeby), address(`DEPLOYED_PROXY_ADDRESS`). Notice that there is a space of [ABI](https://www.quicknode.com/guides/solidity/what-is-an-abi) to be filled in. 
 5. In order to fill in the ABI accordingly, first the underlying implementation contract of proxy contract have to be [verified](#verify-contract) and ABI is then retrieved from implementation contract in Etherscan. First, go to Etherscan then enter the verified implementation contract address. Next, click on the `Contract` in the tab section heading and scroll down to find the `Contract ABI` then copy it.
 6. Paste into the ABI field in Step 5 and press `Add` to add proxy contract into OpenZeppelin Defender.
 7. Run `npx hardhat run scripts/3_propose_upgrade.js --network rinkeby` command and click on the link shown in output of the script.
 8. Approve proposal in OpenZeppelin Defender and proxy contract will be updated with new implementation contract. Keep note that each newly generated implementation contract have to be [verified](#verify-contract) in order to obtain ABI and ABI should be updated in OpenZeppelin Defender proxy contract for contract interaction.
-9. Similar steps are taken to update contract to V3 by running `npx hardhat run scripts/4_propose_upgrade_v3.js --network rinkeby` command and click on the link shown in output of the script. Then,repeat step 9. 
+9. Create proposal to execute `upgradeToV2()` function in OpenZeppelin and approve the proposal as this is the first function that should be executed after successfully upgraded the proxy contract.
+10. Similar steps are taken to update contract to V3 by running `npx hardhat run scripts/4_propose_upgrade_v3.js --network rinkeby` command and click on the link shown in output of the script. Then,repeat step 8. 
 
 
 ### Verify contract
@@ -84,13 +88,31 @@ Next, run `npx hardhat verify <impl_address> --network rinkeby` where `<impl_add
 
 ***
 ## Revision update
-Below elaborated the update and different of each smart contract revision with further optimisation and new features.
 
 ### MakeWorldPeace ERC20 Token V3
-Insert description here
+Fix bug by adding role access modifier (`BURNER_ROLE`) to `burn` and `burnFrom` function of smart contract.
 
+***
 ### MakeWorldPeace ERC20 Token V2
-Insert description here
+Change from owner access modifier to role-based access modifier.
+Each of the function have their own role such as: 
+- `PAUSER_ROLE` for all `pause` and `unpause` function
+- `MINTER_ROLE` for `mint` function
+- `BURNER_ROLE` for `burn_supply` function
 
+
+Each of the role mentioned above can be granted and revoked by owner of address
+
+Assigned role to the address can renounce their own role as well
+
+***
 ### MakeWorldPeace ERC20 Token V1
-Insert description here
+Create ERC20 upgradeable contract with mint, pause (freeze) and burn function.
+Owner access modifier for following functions:
+- `pause` and `unpause`
+- `mint`
+- `burn_supply`
+- `_authorizeUpgrade` (for upgrading contract)
+
+
+Maximum mint amounts of 10,000 within 3 minutes of block time in `mint` function
