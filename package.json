@@ -1,5 +1,9 @@
 {
-  "name": "hardhat-project",
+  "name": "ERC20_upgradeable_token",
+  "version": "1.0.0",
+  "description": "An Upgradeable ERC20 token that is mintable, burnable, freezable with role access",
+  "author": "HY Lim",
+  "license": "MIT",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",
     "@nomiclabs/hardhat-etherscan": "^3.0.3",
