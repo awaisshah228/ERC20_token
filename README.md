@@ -77,7 +77,7 @@ In order to start deploying upgradeable ERC contract, script file is executed as
 6. Paste into the ABI field in Step 5 and press `Add` to add proxy contract into OpenZeppelin Defender.
 7. Run `npx hardhat run scripts/3_propose_upgrade.js --network rinkeby` command and click on the link shown in output of the script.
 8. Approve proposal in OpenZeppelin Defender and proxy contract will be updated with new implementation contract. Keep note that each newly generated implementation contract have to be [verified](#verify-contract) in order to obtain ABI and ABI should be updated in OpenZeppelin Defender proxy contract for contract interaction.
-9. Create proposal to execute `upgradeToV2()` function in OpenZeppelin and approve the proposal as this is the first function that should be executed after successfully upgraded the proxy contract.
+9. Create proposal to execute `upgradeToV2()` function in OpenZeppelin Defender and approve the proposal as this is the first function that should be executed after successfully upgraded the proxy contract.
 10. Similar steps are taken to update contract to V3 by running `npx hardhat run scripts/4_propose_upgrade_v3.js --network rinkeby` command and click on the link shown in output of the script. Then,repeat step 8. 
 
 
